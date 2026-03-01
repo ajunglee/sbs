@@ -58,10 +58,12 @@ function GNB() {
           {/* 왼쪽 영역: 네비게이션 링크 */}
           <div className="gnb-left">
             <Link to="/" className={`gnb-link ${location.pathname === '/' ? 'active' : ''}`}>
-              HOME
+              <span className="gnb-icon">🏠</span>
+              <span className="gnb-text">HOME</span>
             </Link>
             <Link to="/posts" className={`gnb-link ${location.pathname.startsWith('/posts') ? 'active' : ''}`}>
-              게시글
+              <span className="gnb-icon">📋</span>
+              <span className="gnb-text">게시글</span>
             </Link>
           </div>
 
@@ -69,7 +71,10 @@ function GNB() {
           <div className="gnb-right">
             {isLoading ? (
               // 로딩 중: 인증 상태 확인 중
-              <span className="gnb-loading">로딩 중...</span>
+              <span className="gnb-loading">
+                <span className="gnb-icon">⏳</span>
+                <span className="gnb-text">로딩 중...</span>
+              </span>
             ) : isAuthenticated ? (
               // 로그인된 상태: 사용자 프로필 이미지, 이름, 로그아웃 버튼 표시
               <>
@@ -81,20 +86,23 @@ function GNB() {
                     alt="프로필"
                     className="gnb-user-avatar"
                   />
-                  {user?.name}님
+                  <span className="gnb-text">{user?.name}님</span>
                 </Link>
                 <button onClick={handleLogout} className="auth-link logout-button">
-                  로그아웃
+                  <span className="gnb-icon">🚪</span>
+                  <span className="gnb-text">로그아웃</span>
                 </button>
               </>
             ) : (
               // 로그인되지 않은 상태: 로그인/회원가입 버튼 표시
               <>
                 <Link to="/login" className="auth-link">
-                  로그인
+                  <span className="gnb-icon">🔐</span>
+                  <span className="gnb-text">로그인</span>
                 </Link>
                 <Link to="/signup" className="auth-link signup">
-                  회원가입
+                  <span className="gnb-icon">📝</span>
+                  <span className="gnb-text">회원가입</span>
                 </Link>
               </>
             )}
