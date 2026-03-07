@@ -118,47 +118,9 @@ export function usePosts(accessToken, { myPostsOnly = false } = {}) {
         console.log(`[PostList Debug] normalized post[${index}] id=${post?.id} viewCount=${post?.viewCount}`);
       });
 
-      const allViewsZero =
-        normalizedPosts.length > 0 &&
-        normalizedPosts.every((post) => post.viewCount === 0);
-
-      if (!allViewsZero) {
-        setPosts(normalizedPosts);
-        return;
-      }
-
-      console.warn('[PostList Debug] all list viewCount values are 0. Fallback to detail API for view counts.');
-
-      const detailHeaders = {};
-      if (accessToken) {
-        detailHeaders.Authorization = `Bearer ${accessToken}`;
-      }
-
-      const enrichedPosts = await Promise.all(
-        normalizedPosts.map(async (post) => {
-          try {
-            const detailUrl = `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.posts}/${post.id}`;
-            const detailResponse = await axios.get(detailUrl, {
-              headers: detailHeaders,
-              withCredentials: true,
-            });
-
-            const detailData = detailResponse.data?.data || detailResponse.data;
-            const detailViewCount = extractViewCount(detailData);
-
-            return {
-              ...post,
-              viewCount: detailViewCount,
-            };
-          } catch (detailError) {
-            console.warn(`[PostList Debug] detail fallback failed for postId=${post.id}`, detailError);
-            return post;
-          }
-        })
-      );
-
-      console.log('[PostList Debug] enriched posts with detail viewCount:', enrichedPosts);
-      setPosts(enrichedPosts);
+      // 목록 조회에서는 상세 API를 추가 호출하지 않는다.
+      // 조회수 증가 트리거는 게시글 상세 진입(GET /posts/{id}) 시점으로만 유지한다.
+      setPosts(normalizedPosts);
     } catch (err) {
       console.error('게시글 목록 조회 실패:', err);
       setError('게시글을 불러오는데 실패했습니다.');

@@ -1,13 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap');
 
 :root {
-  --bg: #f4f2ed;
-  --surface: #faf8f3;
+  --bg: #fff;
+  --surface: #fff;
   --ink: #121212;
   --muted: #5d5b56;
-  --line: #d8d3c8;
+  --line: #000ㅇ;
   --accent: #0f0f0f;
-  --accent-ink: #f7f5ef;
+  --accent-ink: #fff;
   --radius: 18px;
   --radius-sm: 10px;
   --shadow: 0 12px 40px rgba(18, 18, 18, 0.08);
