@@ -45,12 +45,33 @@ export function usePosts(accessToken, { myPostsOnly = false } = {}) {
         withCredentials: true,
       });
 
+      console.log('[PostList Debug] raw response:', response.data);
+
       if (response.data?.data) {
         const postData = Array.isArray(response.data.data)
           ? response.data.data
           : response.data.data.content || [];
-        setPosts(postData.map(normalizePost));
+
+        console.log('[PostList Debug] raw posts:', postData);
+        postData.forEach((post, index) => {
+          console.log(`[PostList Debug] post[${index}] id=${post?.id}`, {
+            viewCount: post?.viewCount,
+            views: post?.views,
+            viewCnt: post?.viewCnt,
+            hitCount: post?.hitCount,
+            readCount: post?.readCount,
+            view_count: post?.view_count,
+          });
+        });
+
+        const normalizedPosts = postData.map(normalizePost);
+        console.log('[PostList Debug] normalized posts:', normalizedPosts);
+        normalizedPosts.forEach((post, index) => {
+          console.log(`[PostList Debug] normalized post[${index}] id=${post?.id} viewCount=${post?.viewCount}`);
+        });
+        setPosts(normalizedPosts);
       } else {
+        console.log('[PostList Debug] response.data.data is empty:', response.data);
         setPosts([]);
       }
     } catch (err) {
