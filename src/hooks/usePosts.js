@@ -2,18 +2,52 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { API_CONFIG } from '../config';
 
+const toNumberOrNull = (value) => {
+  if (value === null || value === undefined || value === '') return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+};
+
+const pickCount = (...candidates) => {
+  for (const candidate of candidates) {
+    const n = toNumberOrNull(candidate);
+    if (n !== null) return n;
+  }
+  return 0;
+};
+
 const normalizePost = (post) => ({
   ...post,
-  likeCount: post?.likeCount ?? post?.likes ?? post?.like_count ?? 0,
-  commentCount: post?.commentCount ?? post?.comments ?? post?.comment_count ?? 0,
-  viewCount:
-    post?.viewCount ??
-    post?.views ??
-    post?.viewCnt ??
-    post?.hitCount ??
-    post?.readCount ??
-    post?.view_count ??
-    0,
+  likeCount: pickCount(
+    post?.likeCount,
+    post?.likes,
+    post?.like_count,
+    post?.statistics?.likeCount,
+    post?.statistics?.likes,
+    post?.stats?.likeCount,
+    post?.postStats?.likeCount
+  ),
+  commentCount: pickCount(
+    post?.commentCount,
+    post?.comments,
+    post?.comment_count,
+    post?.statistics?.commentCount,
+    post?.statistics?.comments,
+    post?.stats?.commentCount,
+    post?.postStats?.commentCount
+  ),
+  viewCount: pickCount(
+    post?.viewCount,
+    post?.views,
+    post?.viewCnt,
+    post?.hitCount,
+    post?.readCount,
+    post?.view_count,
+    post?.statistics?.viewCount,
+    post?.statistics?.views,
+    post?.stats?.viewCount,
+    post?.postStats?.viewCount
+  ),
 });
 
 /**
@@ -61,6 +95,9 @@ export function usePosts(accessToken, { myPostsOnly = false } = {}) {
             hitCount: post?.hitCount,
             readCount: post?.readCount,
             view_count: post?.view_count,
+            statistics: post?.statistics,
+            stats: post?.stats,
+            postStats: post?.postStats,
           });
         });
 

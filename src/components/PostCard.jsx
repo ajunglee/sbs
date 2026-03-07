@@ -1,8 +1,19 @@
 import { Link } from 'react-router-dom';
 
-/**
- * 게시글 목록 카드
- */
+const toNumberOrNull = (value) => {
+  if (value === null || value === undefined || value === '') return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+};
+
+const pickCount = (...candidates) => {
+  for (const candidate of candidates) {
+    const n = toNumberOrNull(candidate);
+    if (n !== null) return n;
+  }
+  return 0;
+};
+
 function PostCard({ post }) {
   const formatTime = (dateString) => {
     if (!dateString) return '';
@@ -26,16 +37,39 @@ function PostCard({ post }) {
 
   const authorName = post.author?.name || post.userName || '이름없음';
   const authorImage = post.author?.profileImage || post.userProfileImage || null;
-  const likeCount = post.likeCount ?? post.likes ?? post.like_count ?? 0;
-  const commentCount = post.commentCount ?? post.comments ?? post.comment_count ?? 0;
-  const viewCount =
-    post.viewCount ??
-    post.views ??
-    post.viewCnt ??
-    post.hitCount ??
-    post.readCount ??
-    post.view_count ??
-    0;
+
+  const likeCount = pickCount(
+    post.likeCount,
+    post.likes,
+    post.like_count,
+    post.statistics?.likeCount,
+    post.statistics?.likes,
+    post.stats?.likeCount,
+    post.postStats?.likeCount
+  );
+
+  const commentCount = pickCount(
+    post.commentCount,
+    post.comments,
+    post.comment_count,
+    post.statistics?.commentCount,
+    post.statistics?.comments,
+    post.stats?.commentCount,
+    post.postStats?.commentCount
+  );
+
+  const viewCount = pickCount(
+    post.viewCount,
+    post.views,
+    post.viewCnt,
+    post.hitCount,
+    post.readCount,
+    post.view_count,
+    post.statistics?.viewCount,
+    post.statistics?.views,
+    post.stats?.viewCount,
+    post.postStats?.viewCount
+  );
 
   return (
     <Link to={`/posts/${post.id}`} className="post-card">

@@ -30,6 +30,20 @@ function PostDetail() {
   const [isLiked, setIsLiked] = useState(false);
   const [isLikeLoading, setIsLikeLoading] = useState(false);
 
+  const toNumberOrNull = (value) => {
+    if (value === null || value === undefined || value === '') return null;
+    const n = Number(value);
+    return Number.isFinite(n) ? n : null;
+  };
+
+  const pickCount = (...candidates) => {
+    for (const candidate of candidates) {
+      const n = toNumberOrNull(candidate);
+      if (n !== null) return n;
+    }
+    return 0;
+  };
+
   /**
    * 게시글 상세 데이터를 서버에서 가져옵니다.
    * GET /api/posts/{id}
@@ -109,7 +123,17 @@ function PostDetail() {
       const nextLiked = typeof data.liked === 'boolean' ? data.liked : !isLiked;
       const nextLikeCount = typeof data.likeCount === 'number'
         ? data.likeCount
-        : Math.max(0, (post?.likeCount || 0) + (nextLiked ? 1 : -1));
+        : Math.max(
+            0,
+            pickCount(
+              post?.likeCount,
+              post?.likes,
+              post?.like_count,
+              post?.statistics?.likeCount,
+              post?.stats?.likeCount,
+              post?.postStats?.likeCount
+            ) + (nextLiked ? 1 : -1)
+          );
 
       setIsLiked(nextLiked);
       setPost(prev => (prev ? { ...prev, likeCount: nextLikeCount } : prev));
@@ -160,6 +184,36 @@ function PostDetail() {
   // 작성자 정보 추출 (author 객체 또는 직접 필드)
   const authorName = post?.author?.name || post?.userName || '알 수 없음';
   const authorImage = post?.author?.profileImage || post?.userProfileImage || null;
+  const detailLikeCount = pickCount(
+    post?.likeCount,
+    post?.likes,
+    post?.like_count,
+    post?.statistics?.likeCount,
+    post?.statistics?.likes,
+    post?.stats?.likeCount,
+    post?.postStats?.likeCount
+  );
+  const detailCommentCount = pickCount(
+    post?.commentCount,
+    post?.comments,
+    post?.comment_count,
+    post?.statistics?.commentCount,
+    post?.statistics?.comments,
+    post?.stats?.commentCount,
+    post?.postStats?.commentCount
+  );
+  const detailViewCount = pickCount(
+    post?.viewCount,
+    post?.views,
+    post?.viewCnt,
+    post?.hitCount,
+    post?.readCount,
+    post?.view_count,
+    post?.statistics?.viewCount,
+    post?.statistics?.views,
+    post?.stats?.viewCount,
+    post?.postStats?.viewCount
+  );
 
   // 현재 사용자가 게시글 작성자인지 확인
   const isOwner = user && post && (
@@ -242,10 +296,10 @@ function PostDetail() {
                 onClick={handleToggleLike}
                 disabled={isLikeLoading}
               >
-                ♥ {post.likeCount || 0} {isLiked ? '(좋아요 취소)' : '(좋아요)'}
+                ♥ {detailLikeCount} {isLiked ? '(좋아요 취소)' : '(좋아요)'}
               </button>
-              <span className="post-detail-stat">💬 {post.commentCount || 0}</span>
-              <span className="post-detail-stat">👁 {post.viewCount || 0}</span>
+              <span className="post-detail-stat">💬 {detailCommentCount}</span>
+              <span className="post-detail-stat">👁 {detailViewCount}</span>
             </div>
 
             {/* 공개 범위 표시 */}
