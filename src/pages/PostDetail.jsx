@@ -27,6 +27,8 @@ function PostDetail() {
   const [post, setPost] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isLikeLoading, setIsLikeLoading] = useState(false);
 
   /**
    * 게시글 상세 데이터를 서버에서 가져옵니다.
@@ -53,11 +55,17 @@ function PostDetail() {
       console.log('게시글 상세 조회 응답:', response.data);
 
       // 응답 데이터에서 게시글 추출
-      if (response.data?.data) {
-        setPost(response.data.data);
-      } else {
-        setPost(response.data);
-      }
+      const postData = response.data?.data || response.data;
+      setPost(postData);
+
+      // 백엔드 응답 필드명 차이를 고려한 좋아요 상태 추론
+      const likedState = Boolean(
+        postData?.liked ??
+        postData?.isLiked ??
+        postData?.likedByMe ??
+        postData?.likedByCurrentUser
+      );
+      setIsLiked(likedState);
     } catch (err) {
       console.error('게시글 상세 조회 실패:', err);
       if (err.response?.status === 404) {
@@ -74,6 +82,44 @@ function PostDetail() {
   useEffect(() => {
     fetchPost();
   }, [fetchPost]);
+
+  /**
+   * 게시글 좋아요 토글
+   * - 미좋아요 상태: POST /api/posts/{id}/like
+   * - 좋아요 상태: DELETE /api/posts/{id}/like
+   */
+  const handleToggleLike = async () => {
+    if (!accessToken) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    if (isLikeLoading) return;
+
+    setIsLikeLoading(true);
+    try {
+      const url = `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.posts}/${id}/like`;
+      const headers = { Authorization: `Bearer ${accessToken}` };
+
+      const response = isLiked
+        ? await axios.delete(url, { headers, withCredentials: true })
+        : await axios.post(url, {}, { headers, withCredentials: true });
+
+      const data = response.data?.data || {};
+      const nextLiked = typeof data.liked === 'boolean' ? data.liked : !isLiked;
+      const nextLikeCount = typeof data.likeCount === 'number'
+        ? data.likeCount
+        : Math.max(0, (post?.likeCount || 0) + (nextLiked ? 1 : -1));
+
+      setIsLiked(nextLiked);
+      setPost(prev => (prev ? { ...prev, likeCount: nextLikeCount } : prev));
+    } catch (err) {
+      console.error('좋아요 처리 실패:', err);
+      alert('좋아요 처리에 실패했습니다.');
+    } finally {
+      setIsLikeLoading(false);
+    }
+  };
 
   /**
    * 게시글 삭제 핸들러
@@ -190,7 +236,14 @@ function PostDetail() {
 
             {/* 하단 통계 */}
             <div className="post-detail-stats">
-              <span className="post-detail-stat">♥ {post.likeCount || 0}</span>
+              <button
+                type="button"
+                className={`post-detail-like-button ${isLiked ? 'liked' : ''}`}
+                onClick={handleToggleLike}
+                disabled={isLikeLoading}
+              >
+                ♥ {post.likeCount || 0} {isLiked ? '(좋아요 취소)' : '(좋아요)'}
+              </button>
               <span className="post-detail-stat">💬 {post.commentCount || 0}</span>
               <span className="post-detail-stat">👁 {post.viewCount || 0}</span>
             </div>

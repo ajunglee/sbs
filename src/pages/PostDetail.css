@@ -162,6 +162,33 @@
   font-size: 0.9rem;
 }
 
+.post-detail-like-button {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, opacity 0.2s;
+}
+
+.post-detail-like-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.post-detail-like-button.liked {
+  color: #ff8d8d;
+  border-color: rgba(255, 107, 107, 0.5);
+  background: rgba(255, 107, 107, 0.15);
+}
+
+.post-detail-like-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* 공개 범위 표시 */
 .post-detail-visibility {
   color: rgba(255, 255, 255, 0.4);

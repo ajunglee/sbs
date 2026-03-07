@@ -1,15 +1,9 @@
 import { Link } from 'react-router-dom';
 
 /**
- * PostCard 컴포넌트
- *
- * 게시글 목록에서 각 게시글을 카드 형태로 표시합니다.
- * 클릭하면 게시글 상세 페이지로 이동합니다.
- *
- * @param {Object} props.post - 게시글 데이터 (PostListResponse 또는 PostResponse)
+ * 게시글 목록 카드
  */
 function PostCard({ post }) {
-  // 작성 시간을 "몇 분 전" 형태로 변환
   const formatTime = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -26,18 +20,25 @@ function PostCard({ post }) {
     return date.toLocaleDateString('ko-KR');
   };
 
-  // 게시글 내용 미리보기 (최대 150자)
   const previewContent = post.content?.length > 150
     ? post.content.substring(0, 150) + '...'
     : post.content;
 
-  // 작성자 정보 (author 객체 또는 직접 필드)
-  const authorName = post.author?.name || post.userName || '알 수 없음';
+  const authorName = post.author?.name || post.userName || '이름없음';
   const authorImage = post.author?.profileImage || post.userProfileImage || null;
+  const likeCount = post.likeCount ?? post.likes ?? post.like_count ?? 0;
+  const commentCount = post.commentCount ?? post.comments ?? post.comment_count ?? 0;
+  const viewCount =
+    post.viewCount ??
+    post.views ??
+    post.viewCnt ??
+    post.hitCount ??
+    post.readCount ??
+    post.view_count ??
+    0;
 
   return (
     <Link to={`/posts/${post.id}`} className="post-card">
-      {/* 작성자 정보 헤더 */}
       <div className="post-card-header">
         <div className="post-card-author">
           {authorImage ? (
@@ -52,19 +53,16 @@ function PostCard({ post }) {
         <span className="post-card-time">{formatTime(post.createdAt)}</span>
       </div>
 
-      {/* 게시글 내용 */}
       <div className="post-card-content">
         <p>{previewContent}</p>
       </div>
 
-      {/* 썸네일 이미지 (있는 경우) */}
       {(post.thumbnailUrl || (post.images && post.images.length > 0)) && (
         <div className="post-card-thumbnail">
           <img
             src={post.thumbnailUrl || post.images[0]?.imageUrl || post.images[0]?.thumbnailUrl}
             alt="게시글 이미지"
           />
-          {/* 이미지 개수 표시 (2개 이상인 경우) */}
           {(post.imageCount > 1 || (post.images && post.images.length > 1)) && (
             <span className="post-card-image-count">
               +{(post.imageCount || post.images?.length) - 1}
@@ -73,11 +71,10 @@ function PostCard({ post }) {
         </div>
       )}
 
-      {/* 하단 통계 (좋아요, 댓글, 조회수) */}
       <div className="post-card-footer">
-        <span className="post-card-stat">♥ {post.likeCount || 0}</span>
-        <span className="post-card-stat">💬 {post.commentCount || 0}</span>
-        <span className="post-card-stat">👁 {post.viewCount || 0}</span>
+        <span className="post-card-stat">♥ {likeCount}</span>
+        <span className="post-card-stat">💬 {commentCount}</span>
+        <span className="post-card-stat">👁 {viewCount}</span>
       </div>
     </Link>
   );
