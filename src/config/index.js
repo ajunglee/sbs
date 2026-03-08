@@ -38,6 +38,10 @@ export const API_CONFIG = {
     postsWithImages: '/posts/with-images',
     myPosts: '/posts/me',
 
+    // DM
+    dmBase: '/dm',
+    dmRooms: '/dm/rooms',
+
     // OAuth (카카오) - /api/auth 경로를 통해 백엔드로 프록시
     kakaoLogin: '/auth/kakao/login',
     kakaoCallback: '/auth/kakao/callback',

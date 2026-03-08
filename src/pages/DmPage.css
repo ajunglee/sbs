@@ -1,0 +1,154 @@
+.dm-container {
+  min-height: 100vh;
+  padding: 110px 20px 88px;
+}
+
+.dm-card {
+  max-width: 1180px;
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+
+.dm-header h1 {
+  margin: 0;
+  color: var(--ink);
+}
+
+.dm-header p {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.dm-create-form {
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
+}
+
+.dm-create-form input,
+.dm-send-form input {
+  flex: 1;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+}
+
+.dm-create-form button,
+.dm-send-form button,
+.dm-room-item {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.dm-error {
+  color: #a13c2e;
+}
+
+.dm-body {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 12px;
+}
+
+.dm-room-list {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 520px;
+}
+
+.dm-room-list h2,
+.dm-chat h2 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  color: var(--ink);
+}
+
+.dm-room-item {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dm-room-item.active {
+  border-color: var(--ink);
+  background: #f5f2eb;
+}
+
+.dm-room-item span {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.dm-chat {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dm-messages {
+  flex: 1;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  background: #fffcf7;
+}
+
+.dm-message {
+  border: 1px solid #e5dfd1;
+  border-radius: 10px;
+  background: #fff;
+  padding: 10px;
+}
+
+.dm-message + .dm-message {
+  margin-top: 8px;
+}
+
+.dm-message header {
+  margin-bottom: 6px;
+}
+
+.dm-message p {
+  margin: 0;
+}
+
+.dm-send-form {
+  display: flex;
+  gap: 8px;
+}
+
+.dm-empty {
+  margin: 0;
+  color: var(--muted);
+}
+
+@media (max-width: 900px) {
+  .dm-body {
+    grid-template-columns: 1fr;
+  }
+
+  .dm-room-list,
+  .dm-chat {
+    min-height: 360px;
+  }
+}
