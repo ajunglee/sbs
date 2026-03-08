@@ -75,11 +75,17 @@ export const UPLOAD_CONFIG = {
 // OAuth 설정
 // ==========================================
 export const OAUTH_CONFIG = {
+  // OAuth 콜백 전체 URL (선택 사항, 지정하면 우선 사용)
+  callbackUrl: import.meta.env.VITE_OAUTH_CALLBACK_URL || '',
+
   // OAuth 콜백 경로
   callbackPath: import.meta.env.VITE_OAUTH_CALLBACK_PATH || '/oauth/callback',
 
   // 콜백 전체 URL 생성 함수
   getCallbackUrl: () => {
+    if (OAUTH_CONFIG.callbackUrl) {
+      return OAUTH_CONFIG.callbackUrl;
+    }
     return `${window.location.origin}${OAUTH_CONFIG.callbackPath}`;
   },
 };

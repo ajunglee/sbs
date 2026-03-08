@@ -206,22 +206,8 @@ function Login() {
    * - redirectUrl은 URL 인코딩하여 쿼리 파라미터로 전달
    */
   const handleKakaoLogin = () => {
-    // 카카오 OAuth 플로우 완료 후 돌아올 프론트엔드 콜백 URL
-    const callbackUrl = `${window.location.origin}/oauth/callback`;
-
-    // URL 인코딩하여 쿼리 파라미터로 전달
-    const encodedCallbackUrl = encodeURIComponent(callbackUrl);
-
-    // 백엔드의 카카오 로그인 시작 엔드포인트로 전체 페이지 리다이렉트
-    // - /api/auth/kakao/login 경로로 호출 (nginx가 백엔드로 프록시)
-    // - redirectUrl 파라미터: 백엔드가 OAuth 플로우 완료 후 리다이렉트할 프론트엔드 URL
-    // - 백엔드는 이 URL을 세션에 저장했다가 카카오 콜백 처리 후 사용
-    // - 백엔드는 이 요청을 받아 카카오 인증 서버로 다시 리다이렉트
-    // - 현재 페이지(Login.jsx)는 언마운트되고 모든 상태가 사라짐
-    // 백엔드 컨트롤러: @RequestMapping("/auth/kakao") + @GetMapping("/login")
-    // /api/auth/kakao/login 경로로 호출 (nginx /api/ location block이 백엔드로 프록시)
-    // 백엔드 컨트롤러가 /api/auth/kakao/login에 매핑되어 있음
-    window.location.href = `/api/auth/kakao/login?redirectUrl=${encodedCallbackUrl}`;
+    // 백엔드가 콜백(/api/auth/kakao/callback) 포함 OAuth 흐름을 처리
+    window.location.href = '/api/auth/kakao/login';
   }
 
   return (
