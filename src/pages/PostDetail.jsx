@@ -4,31 +4,22 @@ import axios from 'axios';
 
 import GNB from '../components/Gnb';
 import Footer from '../components/Footer';
+import AuthorDmPopup from '../components/AuthorDmPopup';
 import { useAuth } from '../hooks/useAuth';
 import { API_CONFIG } from '../config';
 import './PostDetail.css';
 
-/**
- * PostDetail 컴포넌트
- *
- * 게시글 상세 조회 페이지입니다.
- * - 게시글 전체 내용 표시
- * - 작성자 정보 (프로필 이미지, 이름)
- * - 첨부 이미지 갤러리
- * - 본인 게시글인 경우 삭제 버튼
- * - 좋아요, 댓글, 조회수 통계
- */
 function PostDetail() {
-  const { id } = useParams();           // URL에서 게시글 ID 추출
+  const { id } = useParams();
   const navigate = useNavigate();
   const { user, accessToken } = useAuth();
 
-  // 게시글 상세 데이터
   const [post, setPost] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
   const [isLikeLoading, setIsLikeLoading] = useState(false);
+  const [isAuthorPopupOpen, setIsAuthorPopupOpen] = useState(false);
 
   const toNumberOrNull = (value) => {
     if (value === null || value === undefined || value === '') return null;
@@ -44,35 +35,19 @@ function PostDetail() {
     return 0;
   };
 
-  /**
-   * 게시글 상세 데이터를 서버에서 가져옵니다.
-   * GET /api/posts/{id}
-   */
   const fetchPost = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     try {
       const url = `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.posts}/${id}`;
-
-      // 헤더 구성 (인증 토큰이 있으면 포함)
       const headers = {};
-      if (accessToken) {
-        headers['Authorization'] = `Bearer ${accessToken}`;
-      }
+      if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
 
-      const response = await axios.get(url, {
-        headers,
-        withCredentials: true
-      });
-
-      console.log('게시글 상세 조회 응답:', response.data);
-
-      // 응답 데이터에서 게시글 추출
+      const response = await axios.get(url, { headers, withCredentials: true });
       const postData = response.data?.data || response.data;
       setPost(postData);
 
-      // 백엔드 응답 필드명 차이를 고려한 좋아요 상태 추론
       const likedState = Boolean(
         postData?.liked ??
         postData?.isLiked ??
@@ -81,7 +56,6 @@ function PostDetail() {
       );
       setIsLiked(likedState);
     } catch (err) {
-      console.error('게시글 상세 조회 실패:', err);
       if (err.response?.status === 404) {
         setError('게시글을 찾을 수 없습니다.');
       } else {
@@ -92,22 +66,15 @@ function PostDetail() {
     }
   }, [id, accessToken]);
 
-  // 컴포넌트 마운트 시 게시글 조회
   useEffect(() => {
     fetchPost();
   }, [fetchPost]);
 
-  /**
-   * 게시글 좋아요 토글
-   * - 미좋아요 상태: POST /api/posts/{id}/like
-   * - 좋아요 상태: DELETE /api/posts/{id}/like
-   */
   const handleToggleLike = async () => {
     if (!accessToken) {
       alert('로그인이 필요합니다.');
       return;
     }
-
     if (isLikeLoading) return;
 
     setIsLikeLoading(true);
@@ -124,19 +91,19 @@ function PostDetail() {
       const nextLikeCount = typeof data.likeCount === 'number'
         ? data.likeCount
         : Math.max(
-            0,
-            pickCount(
-              post?.likeCount,
-              post?.likes,
-              post?.like_count,
-              post?.statistics?.likeCount,
-              post?.stats?.likeCount,
-              post?.postStats?.likeCount
-            ) + (nextLiked ? 1 : -1)
-          );
+          0,
+          pickCount(
+            post?.likeCount,
+            post?.likes,
+            post?.like_count,
+            post?.statistics?.likeCount,
+            post?.stats?.likeCount,
+            post?.postStats?.likeCount
+          ) + (nextLiked ? 1 : -1)
+        );
 
       setIsLiked(nextLiked);
-      setPost(prev => (prev ? { ...prev, likeCount: nextLikeCount } : prev));
+      setPost((prev) => (prev ? { ...prev, likeCount: nextLikeCount } : prev));
     } catch (err) {
       console.error('좋아요 처리 실패:', err);
       alert('좋아요 처리에 실패했습니다.');
@@ -145,20 +112,15 @@ function PostDetail() {
     }
   };
 
-  /**
-   * 게시글 삭제 핸들러
-   * DELETE /api/posts/{id}
-   */
   const handleDelete = async () => {
     if (!window.confirm('게시글을 삭제하시겠습니까?')) return;
 
     try {
       const url = `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.posts}/${id}`;
       await axios.delete(url, {
-        headers: { 'Authorization': `Bearer ${accessToken}` },
-        withCredentials: true
+        headers: { Authorization: `Bearer ${accessToken}` },
+        withCredentials: true,
       });
-
       alert('게시글이 삭제되었습니다.');
       navigate('/posts');
     } catch (err) {
@@ -167,9 +129,6 @@ function PostDetail() {
     }
   };
 
-  /**
-   * 작성 시간을 "YYYY.MM.DD HH:mm" 형식으로 변환합니다.
-   */
   const formatDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -181,9 +140,11 @@ function PostDetail() {
     return `${year}.${month}.${day} ${hours}:${minutes}`;
   };
 
-  // 작성자 정보 추출 (author 객체 또는 직접 필드)
   const authorName = post?.author?.name || post?.userName || '알 수 없음';
   const authorImage = post?.author?.profileImage || post?.userProfileImage || null;
+  const authorId = post?.author?.id || post?.userId || post?.authorId || null;
+  const authorEmail = post?.author?.email || post?.userEmail || null;
+
   const detailLikeCount = pickCount(
     post?.likeCount,
     post?.likes,
@@ -215,24 +176,36 @@ function PostDetail() {
     post?.postStats?.viewCount
   );
 
-  // 현재 사용자가 게시글 작성자인지 확인
   const isOwner = user && post && (
     user.id === post.userId ||
     user.id === post.author?.id ||
     user.email === post.author?.email
   );
 
+  const handleStartDm = () => {
+    if (!authorId) return;
+    setIsAuthorPopupOpen(false);
+    navigate('/dm', {
+      state: {
+        dmTargetUser: {
+          id: authorId,
+          name: authorName,
+          email: authorEmail,
+          profileImage: authorImage,
+        },
+      },
+    });
+  };
+
   return (
     <>
       <GNB />
       <div className="post-detail-container">
         {isLoading ? (
-          /* 로딩 상태 */
           <div className="post-detail-loading">
             <p>게시글을 불러오는 중...</p>
           </div>
         ) : error ? (
-          /* 에러 상태 */
           <div className="post-detail-error">
             <p>{error}</p>
             <button onClick={() => navigate('/posts')} className="back-button">
@@ -240,11 +213,13 @@ function PostDetail() {
             </button>
           </div>
         ) : post ? (
-          /* 게시글 상세 내용 */
           <div className="post-detail-card">
-            {/* 작성자 정보 헤더 */}
             <div className="post-detail-header">
-              <div className="post-detail-author">
+              <button
+                type="button"
+                className="post-detail-author post-detail-author-trigger"
+                onClick={() => authorId && setIsAuthorPopupOpen(true)}
+              >
                 {authorImage ? (
                   <img src={authorImage} alt={authorName} className="post-detail-avatar" />
                 ) : (
@@ -256,9 +231,8 @@ function PostDetail() {
                   <span className="post-detail-author-name">{authorName}</span>
                   <span className="post-detail-date">{formatDate(post.createdAt)}</span>
                 </div>
-              </div>
+              </button>
 
-              {/* 본인 게시글인 경우 삭제 버튼 */}
               {isOwner && (
                 <div className="post-detail-actions">
                   <button onClick={handleDelete} className="delete-button">
@@ -268,27 +242,20 @@ function PostDetail() {
               )}
             </div>
 
-            {/* 게시글 본문 */}
             <div className="post-detail-content">
-              {/* 줄바꿈 처리를 위해 whitespace: pre-wrap 사용 */}
               <p>{post.content}</p>
             </div>
 
-            {/* 첨부 이미지 갤러리 */}
             {post.images && post.images.length > 0 && (
               <div className="post-detail-images">
                 {post.images.map((image, index) => (
                   <div key={image.id || index} className="post-detail-image-item">
-                    <img
-                      src={image.imageUrl || image.url}
-                      alt={`게시글 이미지 ${index + 1}`}
-                    />
+                    <img src={image.imageUrl || image.url} alt={`게시글 이미지 ${index + 1}`} />
                   </div>
                 ))}
               </div>
             )}
 
-            {/* 하단 통계 */}
             <div className="post-detail-stats">
               <button
                 type="button"
@@ -296,25 +263,32 @@ function PostDetail() {
                 onClick={handleToggleLike}
                 disabled={isLikeLoading}
               >
-                ♥ {detailLikeCount} {isLiked ? '(좋아요 취소)' : '(좋아요)'}
+                좋아요 {detailLikeCount} {isLiked ? '(취소)' : ''}
               </button>
-              <span className="post-detail-stat">💬 {detailCommentCount}</span>
-              <span className="post-detail-stat">👁 {detailViewCount}</span>
+              <span className="post-detail-stat">댓글 {detailCommentCount}</span>
+              <span className="post-detail-stat">조회 {detailViewCount}</span>
             </div>
 
-            {/* 공개 범위 표시 */}
             {post.visibility && post.visibility !== 'PUBLIC' && (
               <div className="post-detail-visibility">
-                {post.visibility === 'PRIVATE' ? '🔒 비공개' : '👥 팔로워만'}
+                {post.visibility === 'PRIVATE' ? '비공개' : '팔로워만'}
               </div>
             )}
 
-            {/* 목록으로 돌아가기 */}
             <div className="post-detail-footer">
               <button onClick={() => navigate('/posts')} className="back-button">
-                ← 목록으로
+                목록으로
               </button>
             </div>
+
+            <AuthorDmPopup
+              isOpen={isAuthorPopupOpen}
+              onClose={() => setIsAuthorPopupOpen(false)}
+              userName={authorName}
+              userImage={authorImage}
+              userEmail={authorEmail}
+              onStartDm={handleStartDm}
+            />
           </div>
         ) : null}
       </div>

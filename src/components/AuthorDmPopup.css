@@ -1,0 +1,74 @@
+.author-dm-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 15, 15, 0.5);
+  display: grid;
+  place-items: center;
+  z-index: 2000;
+  padding: 16px;
+}
+
+.author-dm-popup {
+  position: relative;
+  width: min(360px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.22);
+  padding: 16px;
+}
+
+.author-dm-close {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--muted);
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.author-dm-user {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 10px 6px 14px;
+}
+
+.author-dm-avatar {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #d5cebf;
+}
+
+.author-dm-user strong {
+  color: var(--ink);
+}
+
+.author-dm-user span {
+  color: var(--muted);
+  font-size: 0.88rem;
+  word-break: break-word;
+}
+
+.author-dm-start {
+  width: 100%;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: #f8f5ed;
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.author-dm-start:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

@@ -55,9 +55,7 @@
 
 .dm-body {
   margin-top: 16px;
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 12px;
+  display: block;
 }
 
 .dm-room-list {
@@ -68,6 +66,11 @@
   flex-direction: column;
   gap: 8px;
   min-height: 520px;
+}
+
+.dm-room-list-only,
+.dm-chat-only {
+  width: 100%;
 }
 
 .dm-room-list h2,
@@ -104,6 +107,40 @@
   gap: 10px;
 }
 
+.dm-chat-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dm-chat-top h2 {
+  margin: 0;
+  flex: 1;
+}
+
+.dm-back-button {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.dm-leave-button {
+  border: 1px solid #d9a7a7;
+  background: #fff4f4;
+  color: #9b2f2f;
+  border-radius: 10px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.dm-leave-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 .dm-messages {
   flex: 1;
   overflow: auto;
@@ -118,10 +155,50 @@
   border-radius: 10px;
   background: #fff;
   padding: 10px;
+  max-width: 78%;
 }
 
 .dm-message + .dm-message {
   margin-top: 8px;
+}
+
+.dm-system-message {
+  margin: 10px auto;
+  text-align: center;
+}
+
+.dm-system-message span {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #eceff3;
+  color: #5f6673;
+  font-size: 0.8rem;
+}
+
+.dm-system-message.is-leave-notice span {
+  background: #efe7dc;
+  color: #6f5d47;
+  border: 1px solid #d8c8b5;
+}
+
+.dm-system-time {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.68rem;
+  color: #8b93a1;
+}
+
+.dm-message.is-other {
+  margin-right: auto;
+  background: #f1f2f4;
+  border-color: #d6dae0;
+}
+
+.dm-message.is-mine {
+  margin-left: auto;
+  background: #dff1ff;
+  border-color: #afd7ff;
 }
 
 .dm-message header {
@@ -130,6 +207,19 @@
 
 .dm-message p {
   margin: 0;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.dm-message-time {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.72rem;
+  color: #6b7280;
+}
+
+.dm-message.is-mine .dm-message-time {
+  text-align: right;
 }
 
 .dm-send-form {
@@ -143,12 +233,66 @@
 }
 
 @media (max-width: 900px) {
-  .dm-body {
-    grid-template-columns: 1fr;
+  .dm-room-list,
+  .dm-chat {
+    min-height: 360px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dm-container {
+    padding: 90px 10px 80px;
+  }
+
+  .dm-card {
+    padding: 12px;
+  }
+
+  .dm-header h1 {
+    font-size: 1.1rem;
+  }
+
+  .dm-header p {
+    font-size: 0.9rem;
+  }
+
+  .dm-create-form,
+  .dm-send-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dm-create-form button,
+  .dm-send-form button {
+    width: 100%;
   }
 
   .dm-room-list,
   .dm-chat {
-    min-height: 360px;
+    min-height: 300px;
+    padding: 10px;
+  }
+
+  .dm-messages {
+    max-height: 45vh;
+  }
+}
+
+@media (max-width: 360px) {
+  .dm-container {
+    padding: 110px 8px 78px;
+  }
+
+  .dm-card {
+    padding: 10px;
+  }
+
+  .dm-create-form input,
+  .dm-send-form input,
+  .dm-create-form button,
+  .dm-send-form button,
+  .dm-room-item {
+    font-size: 0.9rem;
+    padding: 9px 10px;
   }
 }

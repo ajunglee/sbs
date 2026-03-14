@@ -9,16 +9,16 @@ function GNB() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
 
   const handleLogout = async () => {
-    if (!window.confirm('·Î±×¾Æ¿ô ÇÏ½Ã°Ú½À´Ï±î?')) {
+    if (!window.confirm('ï¿½Î±×¾Æ¿ï¿½ ï¿½Ï½Ã°Ú½ï¿½ï¿½Ï±ï¿½?')) {
       return;
     }
 
     try {
       await logout();
-      alert('·Î±×¾Æ¿ôµÇ¾ú½À´Ï´Ù.');
+      alert('ï¿½Î±×¾Æ¿ï¿½ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.');
       navigate('/');
     } catch (error) {
-      console.error('·Î±×¾Æ¿ô Ã³¸® Áß ¿À·ù:', error);
+      console.error('ï¿½Î±×¾Æ¿ï¿½ Ã³ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½:', error);
       navigate('/');
     }
   };
@@ -28,16 +28,19 @@ function GNB() {
       <div className="gnb-container">
         <div className="gnb-left">
           <Link to="/" className={`gnb-link ${location.pathname === '/' ? 'active' : ''}`}>
-            <span className="gnb-icon">H</span>
+            
             <span className="gnb-text">HOME</span>
           </Link>
           <Link to="/posts" className={`gnb-link ${location.pathname.startsWith('/posts') ? 'active' : ''}`}>
-            <span className="gnb-icon">P</span>
+            
             <span className="gnb-text">POSTS</span>
           </Link>
           <Link to="/dm" className={`gnb-link ${location.pathname.startsWith('/dm') ? 'active' : ''}`}>
-            <span className="gnb-icon">D</span>
+            
             <span className="gnb-text">DM</span>
+          </Link>
+          <Link to="/spec" className={`gnb-link ${location.pathname.startsWith('/spec') ? 'active' : ''}`}>
+            <span className="gnb-text">ì†Œê°œ</span>
           </Link>
         </div>
 

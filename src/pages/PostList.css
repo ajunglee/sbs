@@ -104,6 +104,19 @@
   min-width: 0;
 }
 
+.post-card-author-trigger {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.post-card-author-trigger:hover .post-card-author-name {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .post-card-avatar,
 .post-card-avatar-placeholder {
   width: 40px;
@@ -228,7 +241,7 @@
 
 @media (max-width: 768px) {
   .post-list-container {
-    padding: 92px 14px 68px;
+    padding: 120px 14px 68px;
   }
 
   .post-list-header {

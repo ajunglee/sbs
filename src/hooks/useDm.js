@@ -43,6 +43,12 @@ export function useDm(accessToken) {
     });
   }, [accessToken, withState]);
 
+  const findUserByEmail = useCallback(async (email) => {
+    return withState(async () => {
+      return dmService.findUserByEmail(accessToken, email);
+    });
+  }, [accessToken, withState]);
+
   const fetchMessages = useCallback(async (roomId, options) => {
     return withState(async () => {
       const data = await dmService.getMessages(accessToken, roomId, options);
@@ -68,6 +74,19 @@ export function useDm(accessToken) {
     });
   }, [accessToken, withState]);
 
+  const leaveRoom = useCallback(async (roomId) => {
+    return withState(async () => {
+      const result = await dmService.leaveRoom(accessToken, roomId);
+      setRooms((prev) => prev.filter((room) => (room.roomId ?? room.id) !== roomId));
+      setMessagesByRoom((prev) => {
+        const next = { ...prev };
+        delete next[roomId];
+        return next;
+      });
+      return result;
+    });
+  }, [accessToken, withState]);
+
   return {
     rooms,
     messagesByRoom,
@@ -75,9 +94,11 @@ export function useDm(accessToken) {
     error,
     fetchRooms,
     createOrGetRoom,
+    findUserByEmail,
     fetchMessages,
     sendMessage,
     markRead,
+    leaveRoom,
   };
 }
 

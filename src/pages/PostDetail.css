@@ -29,6 +29,19 @@
   gap: 10px;
 }
 
+.post-detail-author-trigger {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.post-detail-author-trigger:hover .post-detail-author-name {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .post-detail-avatar,
 .post-detail-avatar-placeholder {
   width: 44px;

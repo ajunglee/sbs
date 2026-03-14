@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import AuthorDmPopup from './AuthorDmPopup';
 
 const toNumberOrNull = (value) => {
   if (value === null || value === undefined || value === '') return null;
@@ -15,6 +17,9 @@ const pickCount = (...candidates) => {
 };
 
 function PostCard({ post }) {
+  const navigate = useNavigate();
+  const [isAuthorPopupOpen, setIsAuthorPopupOpen] = useState(false);
+
   const formatTime = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -32,11 +37,13 @@ function PostCard({ post }) {
   };
 
   const previewContent = post.content?.length > 150
-    ? post.content.substring(0, 150) + '...'
+    ? `${post.content.substring(0, 150)}...`
     : post.content;
 
   const authorName = post.author?.name || post.userName || '이름없음';
   const authorImage = post.author?.profileImage || post.userProfileImage || null;
+  const authorId = post.author?.id || post.userId || post.authorId || null;
+  const authorEmail = post.author?.email || post.userEmail || null;
 
   const likeCount = pickCount(
     post.likeCount,
@@ -71,46 +78,79 @@ function PostCard({ post }) {
     post.postStats?.viewCount
   );
 
+  const handleOpenAuthorPopup = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!authorId) return;
+    setIsAuthorPopupOpen(true);
+  };
+
+  const handleStartDm = () => {
+    if (!authorId) return;
+    setIsAuthorPopupOpen(false);
+    navigate('/dm', {
+      state: {
+        dmTargetUser: {
+          id: authorId,
+          name: authorName,
+          email: authorEmail,
+          profileImage: authorImage,
+        },
+      },
+    });
+  };
+
   return (
-    <Link to={`/posts/${post.id}`} className="post-card">
-      <div className="post-card-header">
-        <div className="post-card-author">
-          {authorImage ? (
-            <img src={authorImage} alt={authorName} className="post-card-avatar" />
-          ) : (
-            <div className="post-card-avatar-placeholder">
-              {authorName.charAt(0)}
-            </div>
-          )}
-          <span className="post-card-author-name">{authorName}</span>
+    <>
+      <Link to={`/posts/${post.id}`} className="post-card">
+        <div className="post-card-header">
+          <button type="button" className="post-card-author post-card-author-trigger" onClick={handleOpenAuthorPopup}>
+            {authorImage ? (
+              <img src={authorImage} alt={authorName} className="post-card-avatar" />
+            ) : (
+              <div className="post-card-avatar-placeholder">
+                {authorName.charAt(0)}
+              </div>
+            )}
+            <span className="post-card-author-name">{authorName}</span>
+          </button>
+          <span className="post-card-time">{formatTime(post.createdAt)}</span>
         </div>
-        <span className="post-card-time">{formatTime(post.createdAt)}</span>
-      </div>
 
-      <div className="post-card-content">
-        <p>{previewContent}</p>
-      </div>
-
-      {(post.thumbnailUrl || (post.images && post.images.length > 0)) && (
-        <div className="post-card-thumbnail">
-          <img
-            src={post.thumbnailUrl || post.images[0]?.imageUrl || post.images[0]?.thumbnailUrl}
-            alt="게시글 이미지"
-          />
-          {(post.imageCount > 1 || (post.images && post.images.length > 1)) && (
-            <span className="post-card-image-count">
-              +{(post.imageCount || post.images?.length) - 1}
-            </span>
-          )}
+        <div className="post-card-content">
+          <p>{previewContent}</p>
         </div>
-      )}
 
-      <div className="post-card-footer">
-        <span className="post-card-stat">♥ {likeCount}</span>
-        <span className="post-card-stat">💬 {commentCount}</span>
-        <span className="post-card-stat">👁 {viewCount}</span>
-      </div>
-    </Link>
+        {(post.thumbnailUrl || (post.images && post.images.length > 0)) && (
+          <div className="post-card-thumbnail">
+            <img
+              src={post.thumbnailUrl || post.images[0]?.imageUrl || post.images[0]?.thumbnailUrl}
+              alt="게시글 이미지"
+            />
+            {(post.imageCount > 1 || (post.images && post.images.length > 1)) && (
+              <span className="post-card-image-count">
+                +{(post.imageCount || post.images?.length) - 1}
+              </span>
+            )}
+          </div>
+        )}
+
+        <div className="post-card-footer">
+          <span className="post-card-stat">좋아요 {likeCount}</span>
+          <span className="post-card-stat">댓글 {commentCount}</span>
+          <span className="post-card-stat">조회 {viewCount}</span>
+        </div>
+      </Link>
+
+      <AuthorDmPopup
+        isOpen={isAuthorPopupOpen}
+        onClose={() => setIsAuthorPopupOpen(false)}
+        userName={authorName}
+        userImage={authorImage}
+        userEmail={authorEmail}
+        onStartDm={handleStartDm}
+      />
+    </>
   );
 }
 
