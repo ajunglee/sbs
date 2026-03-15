@@ -7,6 +7,7 @@ import Footer from '../components/Footer';
 import AuthorDmPopup from '../components/AuthorDmPopup';
 import { useAuth } from '../hooks/useAuth';
 import { API_CONFIG } from '../config';
+import { resolveMediaUrl } from '../utils/media';
 import './PostDetail.css';
 
 function PostDetail() {
@@ -141,7 +142,7 @@ function PostDetail() {
   };
 
   const authorName = post?.author?.name || post?.userName || '알 수 없음';
-  const authorImage = post?.author?.profileImage || post?.userProfileImage || null;
+  const authorImage = resolveMediaUrl(post?.author?.profileImage || post?.userProfileImage || null);
   const authorId = post?.author?.id || post?.userId || post?.authorId || null;
   const authorEmail = post?.author?.email || post?.userEmail || null;
 
@@ -250,7 +251,10 @@ function PostDetail() {
               <div className="post-detail-images">
                 {post.images.map((image, index) => (
                   <div key={image.id || index} className="post-detail-image-item">
-                    <img src={image.imageUrl || image.url} alt={`게시글 이미지 ${index + 1}`} />
+                    <img
+                      src={resolveMediaUrl(image.imageUrl || image.thumbnailUrl || image.url)}
+                      alt={`게시글 이미지 ${index + 1}`}
+                    />
                   </div>
                 ))}
               </div>

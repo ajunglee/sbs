@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { isAdminRole } from '../utils/auth';
 import './Gnb.css';
 import defaultUserImage from '../assets/default_user.png';
 
@@ -7,18 +8,18 @@ function GNB() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAuthenticated, isLoading, logout } = useAuth();
-
+  const canOpenAdmin = isAdminRole(user?.role);
   const handleLogout = async () => {
-    if (!window.confirm('�α׾ƿ� �Ͻðڽ��ϱ�?')) {
+    if (!window.confirm('로그아웃 하시겠습니까?')) {
       return;
     }
 
     try {
       await logout();
-      alert('�α׾ƿ��Ǿ����ϴ�.');
+      alert('로그아웃되었습니다.');
       navigate('/');
     } catch (error) {
-      console.error('�α׾ƿ� ó�� �� ����:', error);
+      console.error('로그아웃 처리 중 오류:', error);
       navigate('/');
     }
   };
@@ -42,6 +43,11 @@ function GNB() {
           <Link to="/spec" className={`gnb-link ${location.pathname.startsWith('/spec') ? 'active' : ''}`}>
             <span className="gnb-text">소개</span>
           </Link>
+          {canOpenAdmin && (
+            <Link to="/admin" className={`gnb-link ${location.pathname.startsWith('/admin') ? 'active' : ''}`}>
+              <span className="gnb-text">관리자</span>
+            </Link>
+          )}
         </div>
 
         <div className="gnb-right">

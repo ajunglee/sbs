@@ -2,6 +2,16 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import AuthContext from './AuthContext';
 
+const getStoredUser = () => {
+  try {
+    const raw = localStorage.getItem('user');
+    return raw ? JSON.parse(raw) : null;
+  } catch (error) {
+    console.error('localStorage user 파싱 실패:', error);
+    return null;
+  }
+};
+
 /**
  * AuthProvider 컴포넌트
  *
@@ -13,7 +23,7 @@ import AuthContext from './AuthContext';
 export function AuthProvider({ children }) {
   // 사용자 정보를 저장하는 상태
   // user 객체: { id, email, name, role }
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => getStoredUser());
 
   // accessToken을 저장하는 상태
   // JWT 토큰 문자열
@@ -88,7 +98,7 @@ export function AuthProvider({ children }) {
           // 백엔드가 user 정보를 반환하지 않으면 localStorage에서 가져옴
           if (!userData) {
             console.log('백엔드가 user 정보를 반환하지 않음 - localStorage에서 복원');
-            userData = JSON.parse(savedUser);
+            userData = getStoredUser();
           }
 
           console.log('상태 업데이트 전 - user:', user);

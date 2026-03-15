@@ -7,6 +7,9 @@ const assetModules = import.meta.glob('../assets/*.{png,jpg,jpeg,svg,webp}', {
   import: 'default',
 });
 
+const findAsset = (pattern) =>
+  Object.entries(assetModules).find(([path]) => path.includes(pattern))?.[1];
+
 const sectionOrder = [
   'backend',
   'frontend',
@@ -14,7 +17,6 @@ const sectionOrder = [
   'infrastructure',
   'devops',
   'test',
-  'tooling',
 ];
 
 const sectionMeta = {
@@ -41,17 +43,12 @@ const sectionMeta = {
   devops: {
     title: 'DEVOPS / SCM',
     accent: 'violet',
-    description: 'GitHub 중심 형상관리와 GitHub Actions, GHCR 기반 CI/CD 흐름을 구성했습니다.',
+    description: 'GitHub 형상 관리와 GitHub Actions, GHCR 기반 CI/CD 흐름을 구성했습니다.',
   },
   test: {
     title: 'TEST',
     accent: 'amber',
-    description: 'Postman을 사용해 인증, 게시글, DM 등 주요 API 요청과 응답을 검증합니다.',
-  },
-  tooling: {
-    title: 'DEV TOOLS',
-    accent: 'violet',
-    description: 'IDE, 로컬 개발 도구, 빌드 및 테스트 보조 도구를 함께 사용합니다.',
+    description: 'Postman으로 인증, 게시글, DM 등 주요 API 요청과 응답을 검증합니다.',
   },
 };
 
@@ -107,7 +104,7 @@ const cards = [
   },
   {
     id: 'html',
-    src: assetModules['../assets/html_로고-1.png'],
+    src: findAsset('html_'),
     title: 'HTML',
     tag: 'Markup',
     section: 'frontend',
@@ -177,7 +174,7 @@ const cards = [
   },
   {
     id: 'amazon-corretto',
-    src: assetModules['../assets/Amazon_Linux_Logo_v08_Amazon-Linux-right—full-color-1260x616.png'],
+    src: findAsset('Amazon_Linux_Logo_v08_Amazon-Linux-right'),
     title: 'Amazon Corretto 17',
     tag: 'Runtime Image',
     section: 'infrastructure',
@@ -210,63 +207,88 @@ const cards = [
     tag: 'API Test',
     section: 'test',
   },
-  {
-    id: 'github',
-    src: assetModules['../assets/GitHub-logo.png'],
-    title: 'GitHub',
-    tag: 'Repository',
-    section: 'tooling',
-  },
-  {
-    id: 'intellij',
-    src: assetModules['../assets/IntelliJ.png'],
-    title: 'IntelliJ IDEA',
-    tag: 'IDE',
-    section: 'tooling',
-  },
-  {
-    id: 'junit-platform',
-    src: assetModules['../assets/react.png'],
-    title: 'JUnit Platform',
-    tag: 'Test',
-    section: 'tooling',
-  },
 ].filter((card) => Boolean(card.src));
 
 const pipelineSteps = [
-  { id: 'push', title: 'git push', tag: 'Source Update' },
-  { id: 'actions', title: 'GitHub Actions', tag: 'CI/CD' },
-  { id: 'build', title: 'Build', tag: 'Artifact' },
-  { id: 'ghcr', title: 'GHCR', tag: 'Registry' },
-  { id: 'deploy', title: 'Deploy', tag: 'Production' },
+  {
+    id: '01',
+    title: 'git push',
+    tag: 'Source Update',
+    description: '메인 브랜치 반영을 기준으로 배포 파이프라인이 시작됩니다.',
+  },
+  {
+    id: '02',
+    title: 'GitHub Actions',
+    tag: 'CI/CD',
+    description: '워크플로가 빌드, 이미지 생성, 배포 단계를 순차 실행합니다.',
+  },
+  {
+    id: '03',
+    title: 'Build',
+    tag: 'Artifact',
+    description: '프론트엔드와 백엔드 산출물을 배포 가능한 형태로 묶습니다.',
+  },
+  {
+    id: '04',
+    title: 'GHCR',
+    tag: 'Registry',
+    description: '생성된 이미지를 GitHub Container Registry에 업로드합니다.',
+  },
+  {
+    id: '05',
+    title: 'Deploy',
+    tag: 'Production',
+    description: '운영 서버에서 최신 이미지를 pull 한 뒤 서비스를 재기동합니다.',
+  },
 ];
 
 const deploymentNodes = [
   {
-    id: 'prod-frontend',
-    src: assetModules['../assets/nginx.png'],
+    id: '01',
     title: 'prod-frontend',
     tag: 'Nginx + React',
+    description: '정적 프론트엔드를 서빙하고 외부 요청의 진입점을 담당합니다.',
   },
   {
-    id: 'prod-backend',
-    src: assetModules['../assets/spring_boot.png'],
+    id: '02',
     title: 'prod-backend',
     tag: 'Spring Boot',
+    description: 'API, 인증, 비즈니스 로직을 처리하며 내부 네트워크로 연결됩니다.',
   },
   {
-    id: 'prod-mysql',
-    src: assetModules['../assets/mysql.png'],
+    id: '03',
     title: 'mysql',
     tag: 'MySQL 8.0',
+    description: '운영 데이터 저장소로 동작하며 백엔드 컨테이너와만 통신합니다.',
   },
-].filter((card) => Boolean(card.src));
+];
 
 const groupedCards = sectionOrder.map((key) => ({
   key,
   ...sectionMeta[key],
   items: cards.filter((card) => card.section === key),
 }));
+
+function StepLayout({ items }) {
+  return (
+    <div className="spec-step-layout">
+      {items.map((item) => (
+        <article className="spec-step-card" key={item.id}>
+          <div className="spec-step-index" aria-hidden="true">
+            {item.id}
+          </div>
+          <div className="spec-step-body">
+            <div className="spec-step-head">
+              <strong>{item.title}</strong>
+              <span>{item.tag}</span>
+            </div>
+            <p>{item.description}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+}
 
 function ProjectSpecification() {
   return (
@@ -277,7 +299,7 @@ function ProjectSpecification() {
           <section className="spec-hero">
             <span className="spec-hero-pill">TECH STACK</span>
             <h1>Project Specification</h1>
-            <p>Java 17 · Spring Boot 4.0.0 · React 19 · MySQL · Docker · AWS Lightsail · GitHub Actions</p>
+            <p>Java 17 / Spring Boot 4.0.0 / React 19 / MySQL / Docker / AWS Lightsail / GitHub Actions</p>
           </section>
 
           <section className="spec-grid">
@@ -306,30 +328,18 @@ function ProjectSpecification() {
                   ))}
                 </div>
               </article>
+              
             ))}
-          </section>
-
-          <section className="spec-grid">
             <article className="spec-section-card spec-accent-violet">
               <header className="spec-section-header">
                 <div className="spec-section-dot" />
                 <div>
                   <h2>CI/CD PIPELINE</h2>
-                  <p>코드 푸시 이후 GitHub Actions가 빌드하고, 이미지를 GHCR에 저장한 뒤 운영 서버에 배포합니다.</p>
+                  <p>코드 반영 이후 GitHub Actions가 빌드와 이미지 배포를 수행하고 운영 서버 배포까지 이어집니다.</p>
                 </div>
               </header>
 
-              <div className="spec-card-grid">
-                {pipelineSteps.map((step) => (
-                  <article className="spec-tech-card" key={step.id}>
-                    <div className="spec-tech-logo-wrap">
-                      <strong>{step.id.toUpperCase()}</strong>
-                    </div>
-                    <strong>{step.title}</strong>
-                    <span>{step.tag}</span>
-                  </article>
-                ))}
-              </div>
+              <StepLayout items={pipelineSteps} />
             </article>
 
             <article className="spec-section-card spec-accent-rose">
@@ -337,23 +347,15 @@ function ProjectSpecification() {
                 <div className="spec-section-dot" />
                 <div>
                   <h2>DOCKER PROD-NETWORK</h2>
-                  <p>운영 환경에서는 프론트엔드, 백엔드, 데이터베이스 컨테이너가 하나의 네트워크로 연결됩니다.</p>
+                  <p>운영 환경에서는 프론트엔드, 백엔드, 데이터베이스 컨테이너가 하나의 내부 네트워크로 연결됩니다.</p>
                 </div>
               </header>
 
-              <div className="spec-card-grid">
-                {deploymentNodes.map((item) => (
-                  <article className="spec-tech-card" key={item.id}>
-                    <div className="spec-tech-logo-wrap">
-                      <img src={item.src} alt={item.title} className="spec-tech-logo" />
-                    </div>
-                    <strong>{item.title}</strong>
-                    <span>{item.tag}</span>
-                  </article>
-                ))}
-              </div>
+              <StepLayout items={deploymentNodes} />
             </article>
           </section>
+
+          
         </section>
       </main>
       <Footer />

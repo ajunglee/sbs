@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthorDmPopup from './AuthorDmPopup';
+import { resolveMediaUrl } from '../utils/media';
 
 const toNumberOrNull = (value) => {
   if (value === null || value === undefined || value === '') return null;
@@ -41,9 +42,12 @@ function PostCard({ post }) {
     : post.content;
 
   const authorName = post.author?.name || post.userName || '이름없음';
-  const authorImage = post.author?.profileImage || post.userProfileImage || null;
+  const authorImage = resolveMediaUrl(post.author?.profileImage || post.userProfileImage || null);
   const authorId = post.author?.id || post.userId || post.authorId || null;
   const authorEmail = post.author?.email || post.userEmail || null;
+  const previewImageUrl = resolveMediaUrl(
+    post.thumbnailUrl || post.images?.[0]?.imageUrl || post.images?.[0]?.thumbnailUrl
+  );
 
   const likeCount = pickCount(
     post.likeCount,
@@ -121,10 +125,10 @@ function PostCard({ post }) {
           <p>{previewContent}</p>
         </div>
 
-        {(post.thumbnailUrl || (post.images && post.images.length > 0)) && (
+        {previewImageUrl && (
           <div className="post-card-thumbnail">
             <img
-              src={post.thumbnailUrl || post.images[0]?.imageUrl || post.images[0]?.thumbnailUrl}
+              src={previewImageUrl}
               alt="게시글 이미지"
             />
             {(post.imageCount > 1 || (post.images && post.images.length > 1)) && (

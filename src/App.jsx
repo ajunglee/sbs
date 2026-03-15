@@ -10,7 +10,9 @@ import PostCreate from './pages/PostCreate'
 import PostDetail from './pages/PostDetail'
 import DmPage from './pages/DmPage'
 import ProjectSpecification from './pages/ProjectSpecification'
+import AdminPage from './pages/AdminPage'
 import { AuthProvider } from './contexts/AuthProvider'
+import AdminRoute from './components/AdminRoute'
 
 function App() {
 
@@ -33,6 +35,7 @@ function App() {
             <Route path='/posts/:id' element={<PostDetail />}/>
             <Route path='/dm' element={<DmPage />}/>
             <Route path='/spec' element={<ProjectSpecification />}/>
+            <Route path='/admin' element={<AdminRoute><AdminPage /></AdminRoute>}/>
           </Routes>
         </BrowserRouter>
       </AuthProvider>

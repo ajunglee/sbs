@@ -31,6 +31,19 @@ function OAuthCallback() {
   // 중복 실행 방지 (React StrictMode 대응)
   const hasExecutedRef = useRef(false);
 
+  const normalizeOAuthErrorMessage = (message) => {
+    const raw = String(message || '');
+
+    if (
+      raw.includes('Duplicate entry') &&
+      raw.includes('users.')
+    ) {
+      return '이미 같은 이메일로 가입된 계정이 있습니다. 기존 계정으로 로그인했는지 확인하거나 관리자에게 계정 연동을 요청해주세요.';
+    }
+
+    return raw || '로그인 처리 중 오류가 발생했습니다.';
+  };
+
   useEffect(() => {
     // 중복 실행 방지
     if (hasExecutedRef.current) {
@@ -49,8 +62,9 @@ function OAuthCallback() {
         // ==========================================
         const errorMessage = searchParams.get('error');
         if (errorMessage) {
-          console.error('카카오 로그인 실패:', decodeURIComponent(errorMessage));
-          handleError(decodeURIComponent(errorMessage));
+          const decodedMessage = decodeURIComponent(errorMessage);
+          console.error('카카오 로그인 실패:', decodedMessage);
+          handleError(normalizeOAuthErrorMessage(decodedMessage));
           return;
         }
 
