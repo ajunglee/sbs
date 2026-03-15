@@ -131,6 +131,8 @@ function OAuthCallback() {
 
         const user = JSON.parse(decodeURIComponent(userParam));
         console.log('로그인 성공 - 사용자:', user.email || user.name);
+        console.log('[OAuthCallback] hash user payload:', user);
+        console.log('[OAuthCallback] hash user.role:', user?.role);
 
         // AuthContext에 로그인 정보 저장
         login(user, accessToken);
@@ -158,6 +160,8 @@ function OAuthCallback() {
         if (response.data.success) {
           const { accessToken, user } = response.data.data;
           console.log('토큰 교환 성공 - 사용자:', user.email);
+          console.log('[OAuthCallback] exchange-token response:', response.data);
+          console.log('[OAuthCallback] exchange-token user.role:', user?.role);
 
           login(user, accessToken);
           alert('카카오 로그인 성공!');

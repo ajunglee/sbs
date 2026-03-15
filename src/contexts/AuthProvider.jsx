@@ -104,6 +104,7 @@ export function AuthProvider({ children }) {
           console.log('상태 업데이트 전 - user:', user);
           console.log('상태 업데이트 전 - accessToken:', accessToken);
           console.log('새로 설정할 userData:', userData);
+          console.log('[AuthProvider] /api/refresh user.role:', userData?.role);
           console.log('새로 설정할 token:', token);
 
           setUser(userData);
@@ -111,6 +112,7 @@ export function AuthProvider({ children }) {
 
           // localStorage에는 사용자 정보만 저장 (UX 개선용, accessToken은 저장하지 않음)
           localStorage.setItem('user', JSON.stringify(userData));
+          console.log('[AuthProvider] localStorage user saved after refresh:', localStorage.getItem('user'));
           console.log('토큰 갱신 성공 - 상태 업데이트 완료');
         } else {
           // 토큰 갱신 실패: 로그아웃 상태 유지
@@ -149,6 +151,9 @@ export function AuthProvider({ children }) {
    * @param {string} token - accessToken
    */
   const login = (userData, token) => {
+    console.log('[AuthProvider] login() received user:', userData);
+    console.log('[AuthProvider] login() received user.role:', userData?.role);
+
     // 상태 업데이트
     setUser(userData);
     setAccessToken(token);
@@ -157,6 +162,7 @@ export function AuthProvider({ children }) {
     // accessToken은 보안을 위해 메모리(state)에만 저장
     // 페이지 새로고침 시에는 /refresh API를 통해 새 토큰 발급
     localStorage.setItem('user', JSON.stringify(userData));
+    console.log('[AuthProvider] localStorage user saved after login:', localStorage.getItem('user'));
   };
 
   /**
@@ -299,6 +305,11 @@ export function AuthProvider({ children }) {
     refreshAccessToken,  // Refresh Token으로 Access Token 갱신 함수
     isAuthenticated: !!user  // 로그인 여부 (user가 있으면 true)
   };
+
+  useEffect(() => {
+    console.log('[AuthProvider] current user:', user);
+    console.log('[AuthProvider] current user.role:', user?.role);
+  }, [user]);
 
   /**
    * AuthContext.Provider를 사용하여 인증 정보를 하위 컴포넌트에 제공

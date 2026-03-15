@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { isAdminRole } from '../utils/auth';
@@ -9,6 +10,14 @@ function GNB() {
   const location = useLocation();
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const canOpenAdmin = isAdminRole(user?.role);
+
+  useEffect(() => {
+    console.log('[GNB] isAuthenticated:', isAuthenticated);
+    console.log('[GNB] user:', user);
+    console.log('[GNB] user.role:', user?.role);
+    console.log('[GNB] canOpenAdmin:', canOpenAdmin);
+  }, [canOpenAdmin, isAuthenticated, user]);
+
   const handleLogout = async () => {
     if (!window.confirm('로그아웃 하시겠습니까?')) {
       return;

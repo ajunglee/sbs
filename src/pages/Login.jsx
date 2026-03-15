@@ -123,6 +123,10 @@ function Login() {
 
       // 서버 응답 확인
       if (response.data.success) {
+        console.log('[Login] /api/login response:', response.data);
+        console.log('[Login] response.data.data.user:', response.data.data?.user);
+        console.log('[Login] response.data.data.user.role:', response.data.data?.user?.role);
+
         // 로그인 성공: AuthContext에 사용자 정보와 accessToken 저장
         // response.data.data 구조: { accessToken, refreshToken, user: { id, email, name, role } }
         login(response.data.data.user, response.data.data.accessToken);
